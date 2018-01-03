@@ -1,3 +1,6 @@
+// O.R.M where functions will take inputs and conditions
+//Then turning them into database commands 
+
 var connection = require("./connection.js");
 
 function printQuestionMarks(num) {
@@ -6,15 +9,18 @@ function printQuestionMarks(num) {
 	for (var i = 0; i < num; i++) {
 		arr.push("?");
 	}
+
 	return arr.toString();
 }
 
-function objToSql(db) {
+//Values within columns
+function objToSql(ob) {
 	var arr = [];
 
-	for (var key in ob) {
+	for(var key in ob) {
 		arr.push(key + "=" + ob[key]);
 	}
+
 	return arr.toString();
 }
 
@@ -25,30 +31,34 @@ var orm = {
 			if (err) {
 				throw err;
 			}
-			cb(result);
+			cb(result)
 		});
 	},
-	create: function(table, cols, vals, cb) {
+	//Values is an array of values that we want to save to columns
+	//Columns are the columns we want to insert the values into
+	create: function(table, cols,vals, cb) {
 		var queryString = "INSERT INTO " + table;
 
 		queryString += " (";
-    	queryString += cols.toString();
-    	queryString += ") ";
-    	queryString += "VALUES (";
-    	queryString += printQuestionMarks(vals.length);
-    	queryString += ") ";
+		queryString += cols.toString();
+		queryString += ") ";
+		queryString += "VALUES (";
+		queryString += printQuestionMarks(vals.length);
+		queryString += ") ";
 
-    	console.log(queryString);
+		console.log(queryString);
 
-    	connection.query(queryString, vals, function(err, result) {
-    		if (err) {
-    			throw err;
-    		}
-    		cb(results);
-    	});
+		connection.query(queryString, vals, function(err,result) {
+			if (err) {
+				throw err;
+			}
+			cb(result);
+		});
 	},
+	//Update Columns and Values
+
 	update: function(table, objColVals, condition, cb) {
-		var queryString = "UPDATE" + table;
+		var queryString = "UPDATE " + table;
 
 		queryString += " SET ";
     	queryString += objToSql(objColVals);
@@ -62,8 +72,7 @@ var orm = {
     		}
     		cb(result);
     	});
-
 	}
 };
 
- module.exports = orm;
+module.exports = orm;
